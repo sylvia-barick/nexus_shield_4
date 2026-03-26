@@ -64,6 +64,11 @@ export function ContractList({ contracts, onView, onEdit, onDelete }: ContractLi
               <div className="text-xs text-muted-foreground space-y-1">
                 <div>Created: {format(contract.createdAt, "MMM d, yyyy")}</div>
                 <div>Updated: {format(contract.updatedAt, "MMM d, yyyy")}</div>
+                {contract.blockchainHash && (
+                  <div className="font-mono text-[10px] break-all max-w-[300px] text-zinc-500 mt-1">
+                    Blockchain Hash: {contract.blockchainHash}
+                  </div>
+                )}
                 {contract.parties.length > 0 && <div>Parties: {contract.parties.join(", ")}</div>}
               </div>
               <div className="flex gap-2">

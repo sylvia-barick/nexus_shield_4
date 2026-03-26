@@ -28,3 +28,18 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Soroban Deployment Details (Level 2)
+
+? **Contract ID:** `CADI56PK5TY2TXYCCSQJP4OBNFTD6ZVLWINUJNQ4QIUEBECGGIG4RYKA` 
+? **Transaction Hash:** `64af96b8bf501dd1ca32a584e924164e9ca736888ba45371efc4106eba1e1eb2` 
+
+### Setup Steps
+1. **Build Contract:** `cd contract_hash; stellar contract build` 
+2. **Deploy Contract:** `stellar contract deploy --wasm target/wasm32v1-none/release/contract_hash.wasm --source alice --network testnet` 
+3. **Frontend Integration:** Uses `@stellar/stellar-sdk` and `@stellar/freighter-api` to interact with the contract.
+
+### Features Implemented
+- **Transaction Status UI:** Real-time feedback for pending, success, and failed states.
+- **Error Handling:** Specific alerts for wallet not found, user rejection, and insufficient balance.
+- **Real-time Updates:** UI automatically refreshes data after on-chain storage.

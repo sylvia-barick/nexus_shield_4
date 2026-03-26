@@ -1,4 +1,5 @@
 import * as freighterApiModule from "@stellar/freighter-api";
+import albedo from "@albedo-link/intent";
 
 // Handle both standard ESM and potential default export wrappers
 const freighterApi = (freighterApiModule as any).default || freighterApiModule;
@@ -18,29 +19,29 @@ export const SUPPORTED_WALLETS: WalletInfo[] = [
   {
     id: "freighter",
     name: "Freighter",
-    icon: "",
+    icon: "🚢",
     enabled: true,
     description: "Chrome Extension",
   },
   {
     id: "albedo",
     name: "Albedo",
-    icon: "",
+    icon: "🌟",
     enabled: true,
-    description: "Web-based Wallet",
+    description: "Web-based Wallet (No extension required)",
   },
   {
     id: "xbull",
     name: "xBull",
-    icon: "",
-    enabled: true,
+    icon: "🐂",
+    enabled: false,
     description: "Multi-platform Wallet",
   },
   {
     id: "ledger",
     name: "Ledger",
-    icon: "",
-    enabled: true,
+    icon: "🧊",
+    enabled: false,
     description: "Hardware Wallet",
   },
 
@@ -98,6 +99,16 @@ export class StellarWalletService {
     }
   }
 
+  async connectAlbedo(): Promise<{ publicKey: string; network: string }> {
+    try {
+      const { pubkey } = await albedo.publicKey({});
+      // Albedo handles multiple networks but for this project we assume testnet
+      return { publicKey: pubkey, network: "TESTNET" };
+    } catch (error: any) {
+      throw new Error(`Failed to connect to Albedo: ${error.message || "Unknown error"}`);
+    }
+  }
+
   shortenAddress(address: string): string {
     if (!address || address.length < 12) return address
     return `${address.slice(0, 4)}...${address.slice(-4)}`
@@ -108,7 +119,7 @@ export class StellarWalletService {
       case "freighter":
         return this.connectFreighter()
       case "albedo":
-        throw new Error("Albedo wallet integration coming soon")
+        return this.connectAlbedo()
       case "xbull":
         throw new Error("xBull wallet integration coming soon")
       case "ledger":

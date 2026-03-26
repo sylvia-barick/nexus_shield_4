@@ -8,6 +8,8 @@ export interface Contract {
   parties: string[]
   type: string
   jurisdiction: string
+  blockchainHash?: string
+  paymentHash?: string
 }
 
 export interface ContractTemplate {

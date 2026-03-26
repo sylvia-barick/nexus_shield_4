@@ -15,7 +15,9 @@ import { ContractEditor } from "@/components/contract-editor"
 import { ContractList } from "@/components/contract-list"
 import { ContractAnalysisChatbot } from "@/components/contract-analysis-chatbot"
 import { BlockchainAuditTrail } from "@/components/blockchain-audit-trail"
-import { stellarService } from "@/lib/stellar-service"
+import { StellarSorobanInteraction } from "@/components/stellar-soroban-interaction"
+import { stellarService, type WalletType } from "@/lib/stellar-service"
+import { stellarContractService } from "@/lib/stellar-contract-service"
 import { contractService, type Contract, type ContractTemplate } from "@/lib/contract-service"
 import { DottedSurface } from "@/components/ui/dotted-surface"
 import { Tiles } from "@/components/ui/tiles"
@@ -82,16 +84,19 @@ export default function HomePage() {
   const [contracts, setContracts] = useState<Contract[]>([])
   const [contractsView, setContractsView] = useState<"list" | "view">("list")
   const [viewingContract, setViewingContract] = useState<Contract | undefined>()
+  const [requiresBlockchainAction, setRequiresBlockchainAction] = useState(false)
 
   useEffect(() => {
     // Load contracts from persistence store on mount
     setContracts(contractService.getContracts())
   }, [])
 
-  const handleWalletConnect = (publicKey: string, networkType: string) => {
+  const handleWalletConnect = (publicKey: string, networkType: string, walletType: WalletType) => {
     setWalletAddress(publicKey)
     setNetwork(networkType)
     setWalletConnected(true)
+    stellarContractService.setAddress(publicKey)
+    stellarContractService.setWalletType(walletType)
   }
 
   const handleDisconnect = () => {
@@ -114,11 +119,13 @@ export default function HomePage() {
       [],
     )
     setEditingContract(newContract)
+    setRequiresBlockchainAction(true)
     setWorkbenchView("edit")
   }
 
   const handleStartBlank = () => {
     setEditingContract(undefined)
+    setRequiresBlockchainAction(true)
     setWorkbenchView("edit")
   }
 
@@ -132,6 +139,7 @@ export default function HomePage() {
   const handleCancelEdit = () => {
     setWorkbenchView("list")
     setEditingContract(undefined)
+    setRequiresBlockchainAction(false)
   }
 
   const handleViewContract = (contract: Contract) => {
@@ -141,6 +149,7 @@ export default function HomePage() {
 
   const handleEditContract = (contract: Contract) => {
     setEditingContract(contract)
+    setRequiresBlockchainAction(false)
     setActiveSection("workbench")
     setWorkbenchView("edit")
   }
@@ -584,6 +593,12 @@ export default function HomePage() {
                           <Badge variant="outline" className="border-zinc-700 text-zinc-400">{viewingContract?.jurisdiction}</Badge>
                           <Badge className="bg-primary/20 text-primary border-transparent">{viewingContract?.status}</Badge>
                         </div>
+                        {viewingContract?.blockchainHash && (
+                          <div className="mt-4 p-3 bg-muted rounded-md border border-border">
+                            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Blockchain Hash</p>
+                            <p className="text-xs font-mono break-all text-primary">{viewingContract.blockchainHash}</p>
+                          </div>
+                        )}
                       </CardHeader>
                       <CardContent>
                         <div className="whitespace-pre-wrap font-mono text-sm bg-muted p-6 rounded-lg text-foreground border border-border">
@@ -643,6 +658,7 @@ export default function HomePage() {
                     </div>
                     <ContractEditor
                       initialContract={editingContract}
+                      requiresBlockchainAction={requiresBlockchainAction}
                       onSave={handleSaveContract}
                       onCancel={handleCancelEdit}
                     />
@@ -666,10 +682,17 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div>
                   <h1 className="text-3xl font-bold mb-2 text-foreground">Blockchain Verification</h1>
-                  <p className="text-muted-foreground">Anchor contract fingerprints on Stellar blockchain</p>
+                  <p className="text-muted-foreground">Anchor contract fingerprints on Stellar blockchain with Soroban</p>
                 </div>
 
-                <BlockchainAuditTrail />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-8">
+                    <StellarSorobanInteraction />
+                  </div>
+                  <div className="space-y-8">
+                    <BlockchainAuditTrail />
+                  </div>
+                </div>
               </div>
             )}
 

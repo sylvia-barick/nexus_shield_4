@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 interface WalletConnectModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConnect: (publicKey: string, network: string) => void
+  onConnect: (publicKey: string, network: string, walletType: WalletType) => void
 }
 
 export function WalletConnectModal({ open, onOpenChange, onConnect }: WalletConnectModalProps) {
@@ -26,7 +26,7 @@ export function WalletConnectModal({ open, onOpenChange, onConnect }: WalletConn
 
     try {
       const { publicKey, network } = await stellarService.connectWallet(walletType)
-      onConnect(publicKey, network)
+      onConnect(publicKey, network, walletType)
       onOpenChange(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to connect wallet")
