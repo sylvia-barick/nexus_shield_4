@@ -1,257 +1,271 @@
-# 🚀 Nexus-Shield
-
-### Cross-Border Smart Contract Platform on Stellar (Level 2 Submission)
+# 🚀 Nexus Shield – Production-Ready Stellar dApp (Level 4 Submission)
 
 ---
 
 ## 📌 Overview
 
-**Nexus-Shield** is a decentralized application (dApp) built on the **Stellar Testnet**, enabling secure creation, storage, and verification of cross-border agreements using smart contracts.
+**Nexus Shield** is a production-ready, advanced smart contract platform built on **Stellar Testnet** using Soroban.
 
-This project demonstrates **multi-wallet integration**, **smart contract interaction**, and **real-time transaction tracking**, fulfilling all Level 2 (Yellow Belt) requirements.
-
----
-
-## 🎯 Key Features
-
-| Feature | Description |
-|--------|-------------|
-| 🔗 Multi-Wallet Support | Freighter (extension) + Albedo (web wallet) |
-| 📜 Smart Contract | Deployed on Stellar Testnet (Soroban) |
-| ⚡ Contract Interaction | Frontend calls contract functions (`store_hash`) |
-| 🔄 Inter-Contract Calls | Vault contract calls Nexus Token contract |
-| 🪙 Custom Token | Nexus Token (NXST) deployed and mintable |
-| 📡 Real-Time Updates | Transaction status auto-updates |
-| ❗ Error Handling | Wallet not found, rejected, insufficient balance |
-| 🔍 Explorer Integration | Transaction hash + explorer link |
-| 🧠 State Sync | UI reflects blockchain state dynamically |
+This Level 4 submission demonstrates:
+- 🔗 Inter-contract calls (Vault → Token)
+- 🪙 Custom token creation (NexusToken)
+- 📡 Advanced real-time event streaming
+- ⚙️ CI/CD pipeline with GitHub Actions
+- 📱 Mobile responsive design
+- 🔍 Performance monitoring & error tracking
 
 ---
 
-## 🏗️ System Architecture
+## 🌐 Live Demo
+👉 https://nexus-shield-4.vercel.app/
 
-```
-User (Frontend UI)
-        ↓
-Wallet Connection Layer
-(Freighter / Albedo)
-        ↓
-Transaction Creation
-        ↓
-Stellar RPC (Soroban)
-        ↓
-Smart Contract Execution
-        ↓
-Blockchain Confirmation
-        ↓
-Frontend Polling / State Update
-        ↓
-UI Status Update (Pending → Success / Failed)
+## 📂 GitHub Repository
+👉 https://github.com/sylvia-barick/nexus_shield_4
+
+---
+
+## 🏗️ Architecture
+```mermaid
+graph TD
+A[User] --> B[Frontend Next.js]
+B --> C[Wallet Layer]
+C -->|Freighter| D[Freighter API]
+C -->|Albedo| E[Albedo Intent]
+D --> F[Transaction Builder]
+E --> F
+F --> G[Stellar RPC Server]
+G --> H[Nexus Vault Contract]
+H -->|Inter-Contract Call| I[Nexus Token Contract]
+I --> J[Blockchain Confirmation]
+J --> K[Event Stream]
+K --> B
 ```
 
 ---
 
-## 🔄 Flowchart (Execution Flow)
-
-```
-        [User Clicks "Anchor to Blockchain"]
-                        ↓
-        [Connect Wallet Selected]
-                        ↓
-        ┌───────────────┴───────────────┐
-        ↓                               ↓
-[Wallet Connected]             [Wallet Error]
-        ↓                               ↓
-[Create Transaction]           ❌ Show Error
-        ↓
-[Send Transaction to Stellar]
-        ↓
-⏳ Status = Pending
-        ↓
-[Poll Transaction Status]
-        ↓
-   ┌───────────────┬───────────────┐
-   ↓               ↓               ↓
-SUCCESS         FAILED        REJECTED
-   ↓               ↓               ↓
-✅ UI Update   ❌ UI Update   ❌ UI Update
+## 🔄 Execution Flowchart
+```mermaid
+flowchart TD
+A[Open App] --> B[Connect Wallet]
+B --> C{Select Wallet}
+C -->|Freighter| D[Freighter Connect]
+C -->|Albedo| E[Albedo Connect]
+D --> F[Wallet Connected]
+E --> F
+F --> G[Enter Amount]
+G --> H[Call Vault Contract]
+H -->|Inter-Contract Call| I[Vault calls Token Contract]
+I --> J[Token Minted]
+J --> K[Transaction Pending]
+K --> L{Result}
+L -->|Success| M[Show TX Hash]
+L -->|Failed| N[Show Error]
+M --> O[Verify on Explorer]
+O --> P[Event Stream Updates UI]
+N --> Q[Handle Error in UI]
 ```
 
 ---
 
-## 🔐 Smart Contract Details
-
-| Parameter | Value |
-|----------|------|
-| Network | Stellar Testnet |
-| Platform | Soroban |
-| Main Contract | `CADI56PK5T...GIG4RYKA` |
-| Token Contract | `CC4V4V4V4V...AV4V4V4V` |
-| Vault Contract | `CBV5V5V5V5...BV5V5V5V` |
-| Function Used | `store_hash()`, `mint()`, `deposit()` |
-| Inter-contract | Vault → Token (Transfer) |
+## 🔁 Workflow
+```mermaid
+flowchart LR
+A[Push Code] --> B[GitHub Actions Triggered]
+B --> C[Install Dependencies]
+C --> D[Run Tests]
+D --> E[Build Next.js]
+E --> F[Compile Rust Contracts]
+F --> G[CI/CD Pass]
+G --> H[Deploy to Vercel]
+```
 
 ---
 
-## 💻 Tech Stack
+## ⚙️ Features
+
+### 🔐 Multi-Wallet Integration
+- Freighter (Chrome Extension)
+- Albedo (Web Wallet)
+
+### 📜 Smart Contracts (Soroban)
+- **NexusToken** – Custom token with mint and transfer
+- **NexusVault** – Vault with inter-contract calls to Token
+
+### 🔗 Inter-Contract Call
+- Vault calls Token contract via `mint_and_deposit()`
+- Single atomic transaction on Stellar testnet
+
+### 🪙 Custom Token
+- Fully deployed NexusToken on Stellar Testnet
+- Mint and transfer functions working
+
+### 📡 Real-Time Event Streaming
+- Live event feed from blockchain
+- Auto-updates UI after every transaction
+
+### ⚙️ CI/CD Pipeline
+- GitHub Actions workflow
+- Auto build, test, and compile on every push
+
+### 📱 Mobile Responsive
+- Clean UI on all screen sizes
+- Tested on 320px mobile view
+
+### ❗ Error Handling
+- Wallet not installed
+- User rejected transaction
+- Insufficient balance
+
+---
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
-|------|-----------|
-| Frontend | React + Next.js |
+|-------|-----------|
+| Frontend | React / Next.js |
 | Blockchain | Stellar Soroban |
-| Wallet Integration | Stellar Wallets Kit |
-| RPC | Stellar RPC Server |
-| Explorer | Stellar Expert |
+| Smart Contracts | Rust |
+| Wallet | Freighter + Albedo |
+| CI/CD | GitHub Actions |
+| Deployment | Vercel |
+| Testing | Jest |
 
 ---
 
-## 🔗 Multi-Wallet Integration
+## 🔐 Contract Details
 
-| Wallet | Type | Status |
-|-------|------|--------|
-| Freighter | Chrome Extension | ✅ Integrated |
-| Albedo | Web Wallet | ✅ Integrated |
+| Contract | Address |
+|---------|---------|
+| NexusToken | `CB2WWAGKQCXIEGD2LTEDUXDI4V2ZWNW464SMVAEVJRHETRDUAPUF7GOT` |
+| NexusVault | `CCQAVCAFKCSW6SCYPE5WPXID7XQEKGISLWAG56TBVBBA4UBTVYMVGMRI` |
 
----
-
-## ⚠️ Error Handling (3 Required Types)
-
-| Error Type | Handling |
-|-----------|---------|
-| ❌ Wallet Not Installed | UI shows install message |
-| ❌ User Rejected Transaction | UI shows rejection |
-| ❌ Insufficient Balance | UI shows balance error |
-
-👉 Errors are displayed in UI (not just console)
-
----
-
-## ⏳ Transaction Status Tracking
-
-| State | UI Representation |
-|------|------------------|
-| Pending | ⏳ Processing... |
-| Success | ✅ Transaction Successful |
-| Failed | ❌ Transaction Failed |
-
-👉 Status updates in real-time using polling
-
----
-
-## 🔁 Real-Time State Synchronization
-
-- Transaction hash stored after submission  
-- Polling every few seconds using RPC  
-- UI updates automatically based on blockchain response  
-
----
-
-## 🔍 Blockchain Verification
-
-- Transaction hash displayed in UI  
-- Clickable Stellar Explorer link  
-- Fully verifiable on-chain  
-
----
-
-## 📸 Example Transaction Flow
-
-1. User creates contract  
-2. Clicks **Anchor to Blockchain**  
-3. Wallet signs transaction  
-4. Transaction sent to Stellar  
-5. UI shows **Pending**  
-6. After confirmation → **Success**  
-7. Hash available for verification  
-
----
-
-## 📁 Project Structure
-
+### Inter-Contract Transaction Hash
 ```
-/app
-  ├── components/
-  │     ├── contract-editor.tsx
-  │     ├── wallet-connect-modal.tsx
-  │     └── blockchain-integration.tsx
-  ├── lib/
-  │     ├── stellar-contract-service.ts
-  │     ├── stellar-service.ts
-  │     └── utils.ts
-  ├── pages/
-  │     └── index.tsx
+9a217df9329167494d054fd464f483dc18903985f642c748f971d2b2d754bddf
 ```
+👉 https://stellar.expert/explorer/testnet/tx/9a217df9329167494d054fd464f483dc18903985f642c748f971d2b2d754bddf
 
 ---
 
-## 🧪 How to Run
+## 📸 Screenshots
 
+### ⚙️ CI/CD Pipeline (Green)
+![CI/CD](./cicd.png)
+
+### 🔗 Inter-Contract Call on Explorer
+![Inter-Contract](./intercontract.png)
+
+### 🪙 Token Contract History
+![Token](./token.png)
+
+### 📱 Mobile Responsive View
+![Mobile](./mobile.png)
+
+---
+
+## ⚙️ CI/CD Pipeline
+
+![CI Status](https://github.com/sylvia-barick/nexus_shield_4/actions/workflows/stellar-cicd.yml/badge.svg)
+
+The pipeline runs automatically on every push:
+- Install dependencies
+- Run Jest tests
+- Build Next.js production bundle
+- Compile Rust contracts to WASM
+
+---
+
+## 📦 Installation
 ```bash
-npm install
-npm run dev
-```
-
-Open:
-
-```
-http://localhost:3000
+git clone https://github.com/sylvia-barick/nexus_shield_4.git
+cd nexus_shield_4
+pnpm install
+pnpm dev
 ```
 
 ---
 
-## 🔗 Links
-
-- 🚀 Live Demo: YOUR_DEPLOYED_LINK  
-- 📂 GitHub Repo: YOUR_GITHUB_LINK  
-- 🔍 Explorer Example: YOUR_TX_LINK  
+## 🧪 Run Tests
+```bash
+pnpm test
+```
 
 ---
 
-## ✅ Level 2 Requirements Checklist
+## 🦀 Build Contracts
+```bash
+# Token contract
+cd nexus_token
+cargo build --target wasm32-unknown-unknown --release
+
+# Vault contract
+cd nexus_vault
+cargo build --target wasm32-unknown-unknown --release
+```
+
+---
+
+## 📊 Project Structure
+```
+├── app/
+├── components/
+│   ├── dashboard-mobile-nav.tsx
+│   ├── soroban-event-stream.tsx
+│   └── stellar-advanced-interactions.tsx
+├── lib/
+│   ├── stellar-contract-service.ts
+│   ├── stellar-service.ts
+│   └── monitoring.ts
+├── nexus_token/
+│   └── src/lib.rs
+├── nexus_vault/
+│   └── src/lib.rs
+├── __tests__/
+│   └── app.test.js
+└── .github/
+    └── workflows/
+        └── stellar-cicd.yml
+```
+
+---
+
+## 🎯 Level 4 Requirements Checklist
 
 | Requirement | Status |
 |------------|--------|
-| Multi-wallet integration | ✅ |
-| Smart contract deployed | ✅ |
-| Contract called from frontend | ✅ |
-| Transaction status visible | ✅ |
-| 3 error types handled | ✅ |
-| Real-time updates | ✅ |
-| Inter-contract calls | ✅ (Vault → Token) |
-| Custom Token (Soroban) | ✅ (Nexus Token) |
-| 2+ commits | ✅ |
+| Inter-contract call working | ✅ Vault → Token |
+| Custom token deployed | ✅ NexusToken |
+| CI/CD running | ✅ GitHub Actions |
+| Mobile responsive | ✅ Tested at 320px |
+| 8+ meaningful commits | ✅ 8 commits |
+| Public GitHub repo | ✅ |
+| README complete | ✅ |
+| Live demo link | ✅ |
+| Mobile screenshot | ✅ |
+| CI/CD badge + screenshot | ✅ |
+| Contract addresses + TX hash | ✅ |
+| Token address | ✅ |
 
 ---
 
-## 💡 Future Improvements
+## 🚀 Conclusion
 
-- Event-based updates (instead of polling)  
-- Contract read functions  
-- Dashboard with transaction history  
-- Performance optimization  
+Nexus Shield Level 4 demonstrates a **production-ready Stellar dApp** with:
 
----
-
-## 🏁 Conclusion
-
-Nexus-Shield demonstrates a complete **blockchain-integrated workflow** using Stellar:
-
-- Multi-wallet interaction  
-- Smart contract execution  
-- Real-time transaction tracking  
-- Strong error handling  
-
-This project fully satisfies **Level 2 (Yellow Belt)** requirements.
+- Advanced inter-contract call pattern (Vault → Token)
+- Custom Soroban token fully deployed
+- Automated CI/CD pipeline
+- Real-time event streaming
+- Mobile-first responsive design
+- Complete error handling and monitoring
 
 ---
 
-✨ Built for Stellar ecosystem
+## 🙌 Authors
+
+👩‍💻 **Sylvia Barick** – B.Tech AIML  
+👨‍💻 **Debojyoti De Majumder** – B.Tech Blockchain & AI
 
 ---
 
-## 🧪 Test Results
-
-✔ All tests passing (3+ tests)
-
-![Test Output](./test.png)
-
+⭐ If you like this project, give it a star!
