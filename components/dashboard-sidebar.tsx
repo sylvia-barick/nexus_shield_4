@@ -1,6 +1,6 @@
 "use client"
 
-import { FileText, Bot, Link2, Activity, LayoutDashboard, Settings, Users, FileSearch } from "lucide-react"
+import { FileText, Bot, Link2, Activity, LayoutDashboard, Settings, Users, FileSearch, Landmark } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface DashboardSidebarProps {
@@ -15,6 +15,7 @@ const menuItems = [
   { id: "workbench", label: "Workbench", icon: FileSearch, color: "text-orange-500", activeBg: "bg-orange-500/10", activeText: "text-orange-600 dark:text-orange-400" },
   { id: "ai-analysis", label: "AI Analysis", icon: Bot, color: "text-pink-500", activeBg: "bg-pink-500/10", activeText: "text-pink-600 dark:text-pink-400" },
   { id: "blockchain", label: "Blockchain", icon: Link2, color: "text-yellow-500", activeBg: "bg-yellow-500/10", activeText: "text-yellow-600 dark:text-yellow-400" },
+  { id: "advanced", label: "Advanced Features", icon: Landmark, color: "text-indigo-500", activeBg: "bg-indigo-500/10", activeText: "text-indigo-600 dark:text-indigo-400" },
   { id: "audit-trail", label: "Audit Trail", icon: Activity, color: "text-emerald-500", activeBg: "bg-emerald-500/10", activeText: "text-emerald-600 dark:text-emerald-400" },
   { id: "team", label: "Team", icon: Users, color: "text-cyan-500", activeBg: "bg-cyan-500/10", activeText: "text-cyan-600 dark:text-cyan-400" },
   { id: "settings", label: "Settings", icon: Settings, color: "text-slate-500", activeBg: "bg-slate-500/10", activeText: "text-slate-600 dark:text-slate-400" },

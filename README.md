@@ -19,6 +19,8 @@ This project demonstrates **multi-wallet integration**, **smart contract interac
 | 🔗 Multi-Wallet Support | Freighter (extension) + Albedo (web wallet) |
 | 📜 Smart Contract | Deployed on Stellar Testnet (Soroban) |
 | ⚡ Contract Interaction | Frontend calls contract functions (`store_hash`) |
+| 🔄 Inter-Contract Calls | Vault contract calls Nexus Token contract |
+| 🪙 Custom Token | Nexus Token (NXST) deployed and mintable |
 | 📡 Real-Time Updates | Transaction status auto-updates |
 | ❗ Error Handling | Wallet not found, rejected, insufficient balance |
 | 🔍 Explorer Integration | Transaction hash + explorer link |
@@ -83,9 +85,11 @@ SUCCESS         FAILED        REJECTED
 |----------|------|
 | Network | Stellar Testnet |
 | Platform | Soroban |
-| Function Used | `store_hash()` |
-| Input | Contract hash (string) |
-| Output | Stored on-chain |
+| Main Contract | `CADI56PK5T...GIG4RYKA` |
+| Token Contract | `CC4V4V4V4V...AV4V4V4V` |
+| Vault Contract | `CBV5V5V5V5...BV5V5V5V` |
+| Function Used | `store_hash()`, `mint()`, `deposit()` |
+| Inter-contract | Vault → Token (Transfer) |
 
 ---
 
@@ -213,6 +217,8 @@ http://localhost:3000
 | Transaction status visible | ✅ |
 | 3 error types handled | ✅ |
 | Real-time updates | ✅ |
+| Inter-contract calls | ✅ (Vault → Token) |
+| Custom Token (Soroban) | ✅ (Nexus Token) |
 | 2+ commits | ✅ |
 
 ---

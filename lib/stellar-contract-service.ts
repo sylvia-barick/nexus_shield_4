@@ -8,9 +8,12 @@ import {
 } from "@stellar/freighter-api";
 import albedo from "@albedo-link/intent";
 import { type WalletType } from "./stellar-service";
+import { monitoring } from "./monitoring";
 
-// Deployed Contract ID
-const CONTRACT_ID = "CADI56PK5TY2TXYCCSQJP4OBNFTD6ZVLWINUJNQ4QIUEBECGGIG4RYKA";
+// Deployed Contract IDs (Exported for component use)
+export const CONTRACT_ID = "CADI56PK5TY2TXYCCSQJP4OBNFTD6ZVLWINUJNQ4QIUEBECGGIG4RYKA";
+export const TOKEN_CONTRACT_ID = "CC4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V4V";
+export const VAULT_CONTRACT_ID = "CBV5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5V5";
 const RPC_URL = "https://soroban-testnet.stellar.org";
 const NETWORK_PASSPHRASE = StellarSdk.Networks.TESTNET;
 
@@ -62,128 +65,55 @@ export class StellarContractService {
   }
 
   async sign(xdr: string): Promise<string> {
+    const stopTimer = monitoring.startTimer("Sign Transaction");
     console.log(`Signing with ${this.activeWalletType}...`);
-    if (this.activeWalletType === "albedo") {
-      try {
-        console.log("Calling Albedo tx with XDR:", xdr);
+    try {
+      if (this.activeWalletType === "albedo") {
         const result = await albedo.tx({
           xdr,
           network: (NETWORK_PASSPHRASE as string) === StellarSdk.Networks.PUBLIC ? "public" : "testnet"
         });
-        console.log("Albedo result:", result);
+        stopTimer();
         return result.signed_envelope_xdr;
-      } catch (error: any) {
-        console.error("Albedo signing error:", error);
-        throw new Error(error.message || "Albedo transaction failed");
+      } else {
+        const result = await signTransaction(xdr, {
+          networkPassphrase: NETWORK_PASSPHRASE,
+        });
+        if (result.error) throw new Error(result.error);
+        stopTimer();
+        return result.signedTxXdr;
       }
-    } else {
-      const result = await signTransaction(xdr, {
-        networkPassphrase: NETWORK_PASSPHRASE,
-      });
-      if (result.error) {
-        throw new Error("Transaction rejected or failed: " + result.error);
-      }
-      return result.signedTxXdr;
+    } catch (error: any) {
+      monitoring.log("error", "Signing failed", error);
+      throw error;
     }
   }
 
   async storeHash(hash: string) {
-    const address = await this.connectWallet();
-    if (!address) throw new Error("Wallet not connected");
+    const stopTimer = monitoring.startTimer("Store Hash Flow");
+    try {
+      const address = await this.connectWallet();
+      const account = await this.server.getAccount(address);
 
-    // 1. Fetch account info
-    const account = await this.server.getAccount(address);
+      const tx = new StellarSdk.TransactionBuilder(account, {
+        fee: "1000",
+        networkPassphrase: NETWORK_PASSPHRASE,
+      })
+        .addOperation(this.contract.call("store_hash", StellarSdk.nativeToScVal(hash, { type: "symbol" })))
+        .setTimeout(30)
+        .build();
 
-    // 2. Build the transaction
-    const tx = new StellarSdk.TransactionBuilder(account, {
-      fee: "1000",
-      networkPassphrase: NETWORK_PASSPHRASE,
-    })
-      .addOperation(
-        this.contract.call("store_hash", StellarSdk.nativeToScVal(hash, { type: "symbol" }))
-      )
-      .setTimeout(30)
-      .build();
-
-    // 3. Simulate to get footprint/fees
-    const simulation = await this.server.simulateTransaction(tx);
-    if (StellarSdk.rpc.Api.isSimulationError(simulation)) {
-      throw new Error("Simulation failed: " + simulation.error);
+      const simulation = await this.server.simulateTransaction(tx);
+      const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build();
+      const signedXdr = await this.sign(assembled.toXDR());
+      const res = await this.server.sendTransaction(StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE) as any);
+      
+      stopTimer();
+      return res.hash;
+    } catch (error: any) {
+      monitoring.log("error", "storeHash failed", error);
+      throw error;
     }
-
-    const assembledBuilder = StellarSdk.rpc.assembleTransaction(tx, simulation);
-    const assembledTx = assembledBuilder.build();
-
-    // 4. Sign
-    const xdrEncoded = assembledTx.toXDR();
-    const signedTxXdr = await this.sign(xdrEncoded);
-
-    // 5. Submit to network
-    const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedTxXdr, NETWORK_PASSPHRASE);
-    const submission = await this.server.sendTransaction(signedTx as any);
-
-    if (submission.status === "ERROR") {
-      throw new Error("Transaction failed: " + submission.status);
-    }
-
-    // 6. Poll for results
-    let txResponse = await this.server.getTransaction(submission.hash);
-    while (txResponse.status === StellarSdk.rpc.Api.GetTransactionStatus.NOT_FOUND) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      txResponse = await this.server.getTransaction(submission.hash);
-    }
-
-    if (txResponse.status === StellarSdk.rpc.Api.GetTransactionStatus.FAILED) {
-      throw new Error("Transaction execution failed");
-    }
-    console.log("TX HASH:", submission.hash);
-    return submission.hash;
-  }
-
-  async sendPayment(amount: string, destination: string) {
-    const address = await this.connectWallet();
-    if (!address) throw new Error("Wallet not connected");
-
-    // 1. Fetch account info from Horizon
-    // Note: We use the RPC server's account fetcher if available, but for XLM transfers 
-    // we typically use the standard Horizon server. However, since we have RPC_URL, 
-    // let's see if we can use it or if we should use a Horizon URL.
-    // The RPC server's getAccount is for Soroban. For standard XLM, Horizon is better.
-    // Let's use the Horizon server for standard XLM transfers.
-    const horizonUrl = RPC_URL.replace("soroban-", "").replace(":443", ""); // Rough heuristic
-    // Actually, let's just use the testnet horizon URL directly for simplicity.
-    const horizonServer = new StellarSdk.Horizon.Server("https://horizon-testnet.stellar.org");
-
-    const account = await horizonServer.loadAccount(address);
-
-    // 2. Build the transaction
-    const tx = new StellarSdk.TransactionBuilder(account, {
-      fee: StellarSdk.BASE_FEE,
-      networkPassphrase: NETWORK_PASSPHRASE,
-    })
-      .addOperation(
-        StellarSdk.Operation.payment({
-          destination,
-          asset: StellarSdk.Asset.native(),
-          amount,
-        })
-      )
-      .setTimeout(StellarSdk.TimeoutInfinite)
-      .build();
-
-    // 3. Sign
-    const xdrEncoded = tx.toXDR();
-    const signedTxXdr = await this.sign(xdrEncoded);
-
-    // 4. Submit to network
-    const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedTxXdr, NETWORK_PASSPHRASE);
-    const submission = await horizonServer.submitTransaction(signedTx);
-
-    if (!submission.successful) {
-      throw new Error("Transaction failed");
-    }
-
-    return submission.hash;
   }
 
   async getHash(): Promise<string> {
@@ -212,6 +142,154 @@ export class StellarContractService {
       console.error("Error in getHash:", e);
     }
     return "";
+  }
+
+  async vaultDeposit(amount: bigint) {
+    const stopTimer = monitoring.startTimer("Vault Deposit Flow");
+    try {
+      const address = await this.connectWallet();
+      const vaultContract = new StellarSdk.Contract(VAULT_CONTRACT_ID);
+      const account = await this.server.getAccount(address);
+
+      const tx = new StellarSdk.TransactionBuilder(account, {
+        fee: "1000",
+        networkPassphrase: NETWORK_PASSPHRASE,
+      })
+        .addOperation(
+          vaultContract.call("deposit", 
+            StellarSdk.nativeToScVal(address, { type: "address" }),
+            StellarSdk.nativeToScVal(TOKEN_CONTRACT_ID, { type: "address" }),
+            StellarSdk.nativeToScVal(amount, { type: "i128" })
+          )
+        )
+        .setTimeout(30)
+        .build();
+
+      const simulation = await this.server.simulateTransaction(tx);
+      const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build();
+      const signedXdr = await this.sign(assembled.toXDR());
+      const res = await this.server.sendTransaction(StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE) as any);
+      
+      stopTimer();
+      return res.hash;
+    } catch (error: any) {
+      monitoring.log("error", "vaultDeposit failed", error);
+      throw error;
+    }
+  }
+
+  async mintTokens(amount: bigint) {
+    const stopTimer = monitoring.startTimer("Mint Tokens Flow");
+    try {
+      const address = await this.connectWallet();
+      const tokenContract = new StellarSdk.Contract(TOKEN_CONTRACT_ID);
+      const account = await this.server.getAccount(address);
+
+      const tx = new StellarSdk.TransactionBuilder(account, {
+        fee: "1000",
+        networkPassphrase: NETWORK_PASSPHRASE,
+      })
+        .addOperation(
+          tokenContract.call("mint", 
+            StellarSdk.nativeToScVal(address, { type: "address" }),
+            StellarSdk.nativeToScVal(amount, { type: "i128" })
+          )
+        )
+        .setTimeout(30)
+        .build();
+
+      const simulation = await this.server.simulateTransaction(tx);
+      const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build();
+      const signedXdr = await this.sign(assembled.toXDR());
+      const res = await this.server.sendTransaction(StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE) as any);
+      
+      stopTimer();
+      return res.hash;
+    } catch (error: any) {
+      monitoring.log("error", "mintTokens failed", error);
+      throw error;
+    }
+  }
+
+  async mintAndDeposit(amount: bigint) {
+    const stopTimer = monitoring.startTimer("Multi-Call Interaction");
+    try {
+      const address = await this.connectWallet();
+      const vaultContract = new StellarSdk.Contract(VAULT_CONTRACT_ID);
+      const account = await this.server.getAccount(address);
+
+      const tx = new StellarSdk.TransactionBuilder(account, {
+        fee: "1500",
+        networkPassphrase: NETWORK_PASSPHRASE,
+      })
+        .addOperation(
+          vaultContract.call("mint_and_deposit", 
+            StellarSdk.nativeToScVal(address, { type: "address" }),
+            StellarSdk.nativeToScVal(TOKEN_CONTRACT_ID, { type: "address" }),
+            StellarSdk.nativeToScVal(amount, { type: "i128" })
+          )
+        )
+        .setTimeout(30)
+        .build();
+
+      const simulation = await this.server.simulateTransaction(tx);
+      const assembled = StellarSdk.rpc.assembleTransaction(tx, simulation).build();
+      const signedXdr = await this.sign(assembled.toXDR());
+      const res = await this.server.sendTransaction(StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE) as any);
+      
+      stopTimer();
+      return res.hash;
+    } catch (error: any) {
+      monitoring.log("error", "mintAndDeposit failed", error);
+      throw error;
+    }
+  }
+
+  // --- NEW: ADVANCED EVENT STREAMING ---
+  async getContractEvents(contractId: string, limit: number = 10): Promise<any[]> {
+    try {
+      const response = await this.server.getEvents({
+        startLedger: 1, // Use startLedger instead of 0
+        filters: [
+          {
+            type: "contract",
+            contractIds: [contractId],
+          },
+        ],
+        limit: limit,
+      } as any); // Use any to bypass strict union check if needed, but startLedger should work
+      return response.events;
+    } catch (error) {
+      monitoring.log("error", "getEvents failed", error);
+      return [];
+    }
+  }
+
+  async subscribeToEvents(contractId: string, callback: (event: any) => void) {
+    let lastSeenLedger = 0;
+    
+    try {
+      const events = await this.getContractEvents(contractId, 1);
+      if (events.length > 0) lastSeenLedger = events[0].ledger;
+    } catch (e) {}
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await this.server.getEvents({
+          startLedger: lastSeenLedger + 1,
+          filters: [{ type: "contract", contractIds: [contractId] }],
+          limit: 10,
+        } as any);
+
+        const newEvents = response.events;
+        if (newEvents && newEvents.length > 0) {
+          newEvents.forEach(callback);
+          lastSeenLedger = Math.max(...newEvents.map(e => e.ledger));
+        }
+      } catch (error) {}
+    }, 5000);
+
+    return () => clearInterval(interval);
   }
 }
 

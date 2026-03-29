@@ -1,0 +1,14 @@
+D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\deps\serde-b961b41bd360ca9b.d: C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\build\serde-e95785a1e7476d1a\out/private.rs
+
+D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\deps\libserde-b961b41bd360ca9b.rlib: C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\build\serde-e95785a1e7476d1a\out/private.rs
+
+D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\deps\libserde-b961b41bd360ca9b.rmeta: C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\build\serde-e95785a1e7476d1a\out/private.rs
+
+C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs:
+C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs:
+C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs:
+C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs:
+C:\Users\DELL\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs:
+D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\target\release\build\serde-e95785a1e7476d1a\out/private.rs:
+
+# env-dep:OUT_DIR=D:\\stellar\\v0-stellar-wallet-integration-2\\nexus_vault\\target\\release\\build\\serde-e95785a1e7476d1a\\out

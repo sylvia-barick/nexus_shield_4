@@ -1,0 +1,1 @@
+d:\stellar\v0-stellar-wallet-integration-2\build_output_nexus_vault\wasm32-unknown-unknown\release\nexus_vault.wasm: D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\src\lib.rs D:\stellar\v0-stellar-wallet-integration-2\nexus_vault\src\test.rs

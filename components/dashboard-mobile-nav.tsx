@@ -1,6 +1,6 @@
 "use client"
 
-import { FileText, Bot, Link2, Activity, LayoutDashboard, Settings, Users, FileSearch } from "lucide-react"
+import { FileText, Bot, Link2, Activity, LayoutDashboard, Settings, Users, FileSearch, Landmark } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
@@ -17,6 +17,7 @@ const menuItems = [
   { id: "workbench", label: "Workbench", icon: FileSearch },
   { id: "ai-analysis", label: "AI Analysis", icon: Bot },
   { id: "blockchain", label: "Blockchain", icon: Link2 },
+  { id: "advanced", label: "Advanced Features", icon: Landmark },
   { id: "audit-trail", label: "Audit Trail", icon: Activity },
   { id: "team", label: "Team", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
