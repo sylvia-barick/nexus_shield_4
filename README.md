@@ -16,14 +16,6 @@ This Level 4 submission demonstrates:
 
 ---
 
-## 🌐 Live Demo
-👉 https://nexus-shield-4.vercel.app/
-
-## 📂 GitHub Repository
-👉 https://github.com/sylvia-barick/nexus_shield_4
-
----
-
 ## 🏗️ Architecture
 ```mermaid
 graph TD
