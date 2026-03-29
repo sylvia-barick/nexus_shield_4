@@ -150,16 +150,16 @@ G --> H[Deploy to Vercel]
 ## 📸 Screenshots
 
 ### ⚙️ CI/CD Pipeline (Green)
-![CI/CD](./cicd.png)
+![CI/CD](./cicd.jpeg)
 
 ### 🔗 Inter-Contract Call on Explorer
-![Inter-Contract](./intercontract.png)
+![Inter-Contract](./intercontract.jpeg)
 
 ### 🪙 Token Contract History
-![Token](./token.png)
+![Token](./token.jpeg)
 
 ### 📱 Mobile Responsive View
-![Mobile](./mobile.png)
+![Mobile](./mobile.jpeg)
 
 ---
 
