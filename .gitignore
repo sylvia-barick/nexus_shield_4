@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.pnpm-store
 
 # next.js
 /.next/
@@ -9,6 +10,8 @@
 
 # production
 /build
+/build_output*
+/dist
 
 # debug
 npm-debug.log*
@@ -25,3 +28,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Rust/Soroban
+target/
+**/target/
+nexus_vault/target/
+nexus_token/target/
+nexus_vault/target_new/
+build_output_nexus_vault/
+contract_hash/
